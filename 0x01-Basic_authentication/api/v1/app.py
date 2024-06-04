@@ -22,12 +22,12 @@ else:
     auth == BasicAuth()
 
 
-
 @app.errorhandler(404)
 def not_found(error) -> str:
     """ Not found handler
     """
     return jsonify({"error": "Not found"}), 404
+
 
 @app.errorhandler(401)
 def unauthorized(error) -> str:
@@ -35,11 +35,13 @@ def unauthorized(error) -> str:
     """
     return jsonify({"error": "Unauthorized"}), 401
 
+
 @app.errorhandler(403)
 def forbidden(error) -> str:
     """Forbidden handler
     """
     return jsonify({"error": "Forbidden"}), 403
+
 
 @app.before_request
 def before_request():
@@ -49,7 +51,10 @@ def before_request():
         """If auth is not enabled, return"""
         return
 
-    if not auth.require_auth(request.path, ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']):
+    if not auth.require_auth(request.path,
+                             ['/api/v1/status/',
+                              '/api/v1/unauthorized/',
+                              '/api/v1/forbidden/']):
         """if auth is required, check if the request is authorized"""
         return
     if auth.authorization_header(request) is None:
@@ -58,6 +63,7 @@ def before_request():
     if auth.current_user(request) is None:
         """If the current user is not found"""
         abort(403)
+
 
 if __name__ == "__main__":
     host = getenv("API_HOST", "0.0.0.0")
