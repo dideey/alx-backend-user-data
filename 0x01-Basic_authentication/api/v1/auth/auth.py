@@ -27,8 +27,16 @@ class Auth:
             path = path.rstrip('/')
             excluded_paths = [p.rstrip('/') for p in excluded_paths]
 
-            # Check if path is in excluded_paths
-            return path not in excluded_paths
+            # Check if path is in excluded_paths or starts with an excluded
+            # path
+            for excluded_path in excluded_paths:
+                if excluded_path.endswith('*'):
+                    if path.startswith(excluded_path[:-1]):
+                        return False
+                elif path == excluded_path:
+                    return False
+
+            return True
 
     def authorization_header(self, request=None) -> str:
         """
@@ -56,25 +64,3 @@ class Auth:
             TypeVar('User'): Always returns None for now.
         """
         return None
-
-
-class BasicAuth(Auth):
-    """inherits from auth"""
-
-    def extract_base64_authorization_header(
-            self, authorization_header: str) -> str:
-        """
-        Extract the base64 part from the Authorization header.
-
-        Args:
-            authorization_header (str): The Authorization header.
-
-        Returns:
-            str: Always returns None for now.
-        """
-        if (authorization_header is None or
-                type(authorization_header) is not str or
-                not authorization_header.startswith("Basic ")):
-            return None
-        else:
-            return authorization_header[6:]
