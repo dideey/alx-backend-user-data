@@ -39,3 +39,10 @@ class DB:
         self._session.add(user)
         self._session.commit()
         return user
+
+    def find_user_by(self, **kwargs) -> User:
+        """find users using atrributes
+        """
+        if not kwargs:
+            return
+        return self._session.query(User).filter_by(**kwargs).first()
