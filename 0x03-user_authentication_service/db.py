@@ -31,11 +31,11 @@ class DB:
         return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
-        """Add user to the database"""
+        """Save the user to the database
+        """
         if not email or not hashed_password:
             return
         user = User(email=email, hashed_password=hashed_password)
         self._session.add(user)
         self._session.commit()
         return user
-
