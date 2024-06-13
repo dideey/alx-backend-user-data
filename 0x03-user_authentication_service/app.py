@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Flask App
 """
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -50,6 +50,20 @@ def login():
             abort(401)
     except NoResultFound:
         abort(401)
+
+
+@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
+def logout():
+    """Logout users"""
+    session_id = request.cookies.get("session_id")
+    if session_id:
+        try:
+            AUTH.destroy_session(session_id)
+            return redirect('/')
+        except NoResultFound:
+            abort(403)
+    else:
+        abort(403)
 
 
 if __name__ == "__main__":
