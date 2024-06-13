@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Flask App
 """
-import flask
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from auth import Auth
+from sqlalchemy.orm.exc import NoResultFound
 
 
 AUTH = Auth()
@@ -33,17 +33,23 @@ def users():
 
 @app.route('/sessions', methods=['POST'], strict_slashes=False)
 def login():
-    """Post /sessions
-    """
-    email = request.form.get('email')
-    password = request.form.get('password')
-    if AUTH.valid_login(email, password):
-        session_id = AUTH.create_session(email)
-        return jsonify({"email": email,
-                        "message": "logged in",
-                        "session_id": session_id})
-    else:
-        return flask.abort(401)
+    """Login user"""
+    try:
+        email = request.form.get("email")
+        password = request.form.get("password")
+    except KeyError:
+        abort(400)
+
+    try:
+        if AUTH.valid_login(email, password):
+            session_id = AUTH.create_session(email)
+            response = jsonify({"email": email, "message": "logged in"})
+            response.set_cookie("session_id", session_id)
+            return response
+        else:
+            abort(401)
+    except NoResultFound:
+        abort(401)
 
 
 if __name__ == "__main__":
