@@ -24,7 +24,7 @@ class Auth:
     def register_user(self, email: str, password: str) -> User:
         """Register a new user
         """
-        if not email or password:
+        if not email or not password:
             return None
 
         try:
